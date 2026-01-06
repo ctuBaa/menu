@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Меню Шаурма</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: url('https://avatars.mds.yandex.net/get-altay/16503558/2a00000198f685fa0800ca78e4e4846e0068/XXXL') no-repeat center center;
+      background-size: cover;
+      color: white;
+      padding: 16px 12px;
+      min-height: 100vh;
+      background-blend-mode: overlay;
+      background-color: rgba(0, 0, 0, 0.75);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .header h1 {
+      font-size: 2.4rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px rgba(255,255,255,0.8);
+      margin-bottom: 10px;
+    }
+
+    .header h1::after {
+      content: '';
+      display: block;
+      width: 150px;
+      height: 3px;
+      background: #fff;
+      margin: 10px auto;
+      box-shadow: 0 0 8px rgba(255,255,255,0.5);
+    }
+
+    .cart {
+      background: #ffcc00;
+      color: black;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      font-weight: bold;
+      z-index: 1000;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      width: fit-content;
+      margin-left: auto;
+      margin-right: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .cart {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        margin: 0;
+      }
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    .menu-item {
+      background: rgba(18, 18, 18, 0.88);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.7);
+      transition: transform 0.25s ease;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .menu-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.8);
+    }
+
+    .item-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-bottom: 3px solid #ffcc00;
+    }
+
+    .item-info {
+      padding: 12px;
+      text-align: center;
+    }
+
+    .item-name {
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin: 8px 0;
+      color: #ffcc00;
+      text-transform: uppercase;
+      text-shadow: 0 0 4px rgba(255,255,255,0.5);
+    }
+
+    .item-price {
+      background: white;
+      color: black;
+      font-weight: bold;
+      font-size: 1.15rem;
+      padding: 6px 14px;
+      border-radius: 50px;
+      display: inline-block;
+      margin: 8px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .add-btn {
+      background: #ffcc00;
+      color: black;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+      margin-top: 8px;
+      font-size: 0.95rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .add-btn:hover {
+      background: #ffdd44;
+      transform: scale(1.03);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.88);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .modal-content {
+      background: rgba(18, 18, 18, 0.95);
+      padding: 20px 16px;
+      border-radius: 14px;
+      max-width: 95vw;
+      width: 500px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(255,255,255,0.1);
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .modal-title {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+      color: #ffcc00;
+      text-shadow: 0 0 5px rgba(255,255,255,0.5);
+    }
+
+    .cart-items {
+      text-align: left;
+      margin: 0 auto;
+      max-width: 400px;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #3a3a3a;
+    }
+
+    .cart-item-name {
+      flex: 1;
+      font-size: 1rem;
+    }
+
+    .cart-item-qty {
+      margin: 0 8px;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .cart-item-price {
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .btn-remove-one,
+    .btn-remove-all {
+      background: none;
+      border: none;
+      color: #ff6b6b;
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 4px;
+    }
+
+    .btn-remove-one:hover,
+    .btn-remove-all:hover {
+      background: rgba(255, 107, 107, 0.15);
+    }
+
+    .cart-total {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 16px 0;
+      color: #ffcc00;
+      text-shadow: 0 0 5px rgba(255,255,255,0.5);
+    }
+
+    /* ✅ КНОПКА ОПЛАТЫ — добавлено */
+    .pay-btn {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      margin: 16px 0;
+      width: 100%;
+      max-width: 300px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: all 0.2s ease;
+    }
+
+    .pay-btn:hover:not(:disabled) {
+      background: #45a049;
+      transform: scale(1.03);
+    }
+
+    .pay-btn:disabled {
+      background: #555;
+      color: #888;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.7;
+    }
+
+    .close-btn {
+      background: #ff4444;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 12px;
+      font-size: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .close-btn:hover {
+      background: #ff2222;
+    }
+
+    .payment-banner {
+      background: rgba(255, 204, 0, 0.92);
+      color: black;
+      padding: 12px;
+      margin: 16px auto;
+      border-radius: 10px;
+      max-width: 360px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      backdrop-filter: blur(4px);
+    }
+
+    #notification {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffcc00;
+      color: black;
+      padding: 12px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      z-index: 3000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    @media (max-width: 480px) {
+      .header h1 { font-size: 2rem; }
+      .item-image { height: 150px; }
+      .item-name { font-size: 1rem; }
+      .item-price { font-size: 1rem; padding: 5px 12px; }
+      .add-btn { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="notification"></div>
+
+  <div class="cart" id="cartBtn">
+    🛒 <span id="cartCount">0</span> | <span id="cartTotal">0 ₽</span>
+  </div>
+
+  <div class="header">
+    <h1>МЕНЮ</h1>
+  </div>
+
+  <div class="menu-grid" id="menuGrid">
+    <!-- Все изображения — без пробелов в src -->
+    <div class="menu-item" data-name="ШАУРМА КЛАССИЧЕСКАЯ" data-price="300">
+      <img src="https://cdn.food.ru/unsigned/fit/640/480/ce/0/czM6Ly9tZWRpYS9waWN0dXJlcy8yMDI1MDIxMy80RFludUMuanBlZw.jpg" alt="Классическая шаурма с курицей и овощами" class="item-image">
+      <div class="item-info">
+        <div class="item-name">ШАУРМА КЛАССИЧЕСКАЯ</div>
+        <div class="item-price">300 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="ШАУРМА СЫРНАЯ" data-price="300">
+      <img src="https://io.activecloud.com/storage/cache/data/shops/42024/201737-400x400.jpg" alt="Шаурма с плавленым сыром и соусом" class="item-image">
+      <div class="item-info">
+        <div class="item-name">ШАУРМА СЫРНАЯ</div>
+        <div class="item-price">300 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="ШАУРМА ЧЕСНОЧНАЯ" data-price="300">
+      <img src="https://avatars.mds.yandex.net/i?id=45359b744c33cadbeaae8f8adaa8e384_l-4614182-images-thumbs&n=13" alt="Шаурма с чесночным соусом и зеленью" class="item-image">
+      <div class="item-info">
+        <div class="item-name">ШАУРМА ЧЕСНОЧНАЯ</div>
+        <div class="item-price">300 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="СУВЛАК" data-price="350">
+      <img src="https://cafegreco.ru/images/virtuemart/product/resized/%D0%BF%D0%B8%D1%82%D0%B0-%D1%81%D1%83%D0%B2%D0%BB%D0%B0%D0%BA%D0%B8_749x493.jpg" alt="Сувлак с картофелем фри и соусом" class="item-image">
+      <div class="item-info">
+        <div class="item-name">СУВЛАК</div>
+        <div class="item-price">350 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="СОСИСКА В ЛАВАШЕ" data-price="250">
+      <img src="https://static.1000.menu/img/content-v2/30/89/17244/xot-dog-v-lavashe_1652078590_17_max.jpg" alt="Сосиска в лаваше с овощами и соусом" class="item-image">
+      <div class="item-info">
+        <div class="item-name">СОСИСКА В ЛАВАШЕ</div>
+        <div class="item-price">250 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="ХОТДОГ" data-price="180">
+      <img src="https://images.av.ru/av.ru/product/hb8/h61/9695695339550.jpg" alt="Хотдог с кетчупом, горчицей и луком" class="item-image">
+      <div class="item-info">
+        <div class="item-name">ХОТДОГ</div>
+        <div class="item-price">180 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="ШАУРМА НА ТАРЕЛКЕ" data-price="420">
+      <img src="https://avatars.mds.yandex.net/get-altay/13206104/2a00000196c8edef326eb14c6a7d662caa65/XXL_height" alt="Шаурма на тарелке с рисом, овощами и соусом" class="item-image">
+      <div class="item-info">
+        <div class="item-name">ШАУРМА НА ТАРЕЛКЕ</div>
+        <div class="item-price">420 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="СУВЛАК НА ТАРЕЛКЕ" data-price="420">
+      <img src="https://avatars.mds.yandex.net/get-altay/13078542/2a0000019006518c2935a8507827b83190e6/XXL_height" alt="Сувлак на тарелке с картофелем и овощами" class="item-image">
+      <div class="item-info">
+        <div class="item-name">СУВЛАК НА ТАРЕЛКЕ</div>
+        <div class="item-price">420 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="ПЛОВ" data-price="280">
+      <img src="https://static.life.ru/ip/unsafe/rs:fit:1200:/q:98/sh:0.5/czM6Ly9saWZlLXN0YXRpYy9wdWJsaWNhdGlvbnMvMjAyNS80LzIxLzg3MjczMDQwNzUzNC4xNDI3LndlYnA=.webp" alt="Аппетитный плов с мясом и морковью" class="item-image">
+      <div class="item-info">
+        <div class="item-name">ПЛОВ</div>
+        <div class="item-price">280 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="ЛАГМАН" data-price="290">
+      <img src="https://images.gastronom.ru/sMI5UljCikwfdwotaq6qXmsR3Y4lp1Av4JYp5R6xRCo/pr:content-group-preview-image/g:ce/rs:auto:0:0:0/L2Ntcy9hbGwtaW1hZ2VzLzU2MzhmM2VkLTVhOTYtNDkzOC1iZjA4LWQ2NTBiM2M2MmE1MS5qcGc" alt="Лагман с говядиной и овощами" class="item-image">
+      <div class="item-info">
+        <div class="item-name">ЛАГМАН</div>
+        <div class="item-price">290 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="КАЗАН КЕБАБ" data-price="320">
+      <img src="https://avatars.mds.yandex.net/i?id=1df87239c0cf4bef2c3c4e85ed75f5cf_l-5232281-images-thumbs&n=13" alt="Казан кебаб с овощами и специями" class="item-image">
+      <div class="item-info">
+        <div class="item-name">КАЗАН КЕБАБ</div>
+        <div class="item-price">320 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="ШУРПА" data-price="260">
+      <img src="https://kuban24.tv/wp-content/uploads/2025/10/Bez-imeni-1-7.jpg" alt="Шурпа с мясом и овощами в горшочке" class="item-image">
+      <div class="item-info">
+        <div class="item-name">ШУРПА</div>
+        <div class="item-price">260 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="САМСА" data-price="150">
+      <img src="https://images.news.ru/photo/beeef6ac-0bf7-11f0-aa1f-ac1f6bad3ff4_780.jpg" alt="Золотистая самса с мясом" class="item-image">
+      <div class="item-info">
+        <div class="item-name">САМСА</div>
+        <div class="item-price">150 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="КАРТОФЕЛЬ ФРИ" data-price="180">
+      <img src="https://avatars.mds.yandex.net/i?id=e48c7e2631c79814792bcae24a575373_l-5849607-images-thumbs&n=13" alt="Хрустящий картофель фри с соусом" class="item-image">
+      <div class="item-info">
+        <div class="item-name">КАРТОФЕЛЬ ФРИ</div>
+        <div class="item-price">180 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+
+    <div class="menu-item" data-name="НАГЕТСЫ" data-price="180">
+      <img src="https://i.pinimg.com/474x/23/61/ce/2361ceb86d999535b293f925484798b4.jpg" alt="Куриные нагетсы с соусом" class="item-image">
+      <div class="item-info">
+        <div class="item-name">НАГЕТСЫ</div>
+        <div class="item-price">180 ₽</div>
+        <button class="add-btn">Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="payment-banner">
+    Платите как удобно 💳
+  </div>
+
+  <div class="modal" id="cartModal">
+    <div class="modal-content">
+      <div class="modal-title">🛒 Ваша корзина</div>
+      <div class="cart-items" id="cartItemsList"></div>
+      <div class="cart-total" id="cartTotalDisplay">Итого: 0 ₽</div>
+      <button class="pay-btn" id="payBtn" disabled>💳 Оплатить</button>
+      <button class="close-btn" id="closeCart">Закрыть</button>
+    </div>
+  </div>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartBtn = document.getElementById('cartBtn');
+    const cartModal = document.getElementById('cartModal');
+    const closeCart = document.getElementById('closeCart');
+    const cartItemsList = document.getElementById('cartItemsList');
+    const cartCount = document.getElementById('cartCount');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartTotalDisplay = document.getElementById('cartTotalDisplay');
+    const payBtn = document.getElementById('payBtn');
+    const notificationEl = document.getElementById('notification');
+
+    function saveCart() {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    function updateCart() {
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      cartCount.textContent = totalItems;
+      cartTotal.textContent = `${totalPrice} ₽`;
+      cartTotalDisplay.textContent = `Итого: ${totalPrice} ₽`;
+      
+      // ✅ Активировать/деактивировать кнопку оплаты
+      payBtn.disabled = totalItems === 0;
+    }
+
+    function updateCartDisplay() {
+      cartItemsList.innerHTML = '';
+
+      if (cart.length === 0) {
+        cartItemsList.innerHTML = '<p style="color:#aaa;">Корзина пуста 😔</p>';
+        return;
+      }
+
+      cart.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-qty">${item.quantity}</div>
+          <div class="cart-item-price">${item.price * item.quantity} ₽</div>
+          <button class="btn-remove-one" title="Убрать 1 шт" onclick="removeOne(${index})">−</button>
+          <button class="btn-remove-all" title="Убрать всё" onclick="removeAll(${index})">🗑️</button>
+        `;
+        cartItemsList.appendChild(div);
+      });
+    }
+
+    function showNotification(message) {
+      notificationEl.textContent = message;
+      notificationEl.style.opacity = '1';
+      notificationEl.style.transform = 'translate(-50%, 0)';
+
+      setTimeout(() => {
+        notificationEl.style.opacity = '0';
+        notificationEl.style.transform = 'translate(-50%, -30px)';
+      }, 2500);
+    }
+
+    // ✅ ОБРАБОТЧИК ОПЛАТЫ
+    payBtn.addEventListener('click', () => {
+      if (cart.length === 0) return;
+
+      // 💡 Здесь можно:
+      // — отправить заказ на сервер
+      // — открыть платёжную форму
+      // — перейти в WhatsApp/Telegram
+
+      showNotification('✅ Заказ принят! Ожидайте звонка оператора.');
+
+      // Пример: открыть WhatsApp (замените номер)
+      // const phone = '+79123456789';
+      // const text = `Заказ: ${cart.map(i => i.name + ' x' + i.quantity).join(', ')}. Итого: ${cart.reduce((s,i)=>s+i.price*i.quantity,0)} ₽`;
+      // window.location.href = `https://wa.me/${phone.replace(/\D/g,'')}?text=${encodeURIComponent(text)}`;
+
+      // Очистить корзину после оплаты (опционально)
+      // cart = [];
+      // saveCart();
+      // updateCart();
+      // cartModal.style.display = 'none';
+    });
+
+    document.querySelectorAll('.add-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const item = button.closest('.menu-item');
+        const name = item.dataset.name;
+        const price = parseInt(item.dataset.price);
+
+        const existing = cart.find(i => i.name === name);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ name, price, quantity: 1 });
+        }
+
+        updateCart();
+        updateCartDisplay(); // ✅ обновить интерфейс
+        showNotification(`✅ ${name} — +1`);
+        saveCart();
+      });
+    });
+
+    window.removeOne = function(index) {
+      if (cart[index]) {
+        cart[index].quantity -= 1;
+        if (cart[index].quantity <= 0) {
+          cart.splice(index, 1);
+        }
+        updateCart();
+        updateCartDisplay();
+        saveCart();
+      }
+    };
+
+    window.removeAll = function(index) {
+      if (cart[index]) {
+        cart.splice(index, 1);
+        updateCart();
+        updateCartDisplay();
+        saveCart();
+      }
+    };
+
+    cartBtn.addEventListener('click', () => {
+      updateCartDisplay();
+      cartModal.style.display = 'flex';
+    });
+
+    closeCart.addEventListener('click', () => {
+      cartModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === cartModal) {
+        cartModal.style.display = 'none';
+      }
+    });
+
+    updateCart();
+  </script>
+
+</body>
+</html>
